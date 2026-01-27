@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing - Lead Generation Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-around;
+            margin: 3rem 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step.complete {
+            opacity: 1;
+        }
+
+        .step-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-icon {
+            background: #dbeafe;
+            animation: pulse 2s infinite;
+        }
+
+        .step.complete .step-icon {
+            background: #d1fae5;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .step-text {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .status-text {
+            font-size: 1.2rem;
+            color: #555;
+            margin: 2rem 0 1rem;
+        }
+
+        .time-estimate {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            margin: 2rem auto;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lead-Generierung läuft...</h1>
+
+        <div class="progress-steps">
+            <div class="step" id="step-recherche">
+                <div class="step-icon" id="icon-recherche">🔍</div>
+                <div class="step-text">Recherche</div>
+            </div>
+
+            <div class="step" id="step-analyse">
+                <div class="step-icon" id="icon-analyse">📊</div>
+                <div class="step-text">Analyse</div>
+            </div>
+
+            <div class="step" id="step-enrichment">
+                <div class="step-icon" id="icon-enrichment">📧</div>
+                <div class="step-text">Kontakt Enrichment</div>
+            </div>
+
+            <div class="step" id="step-fertig">
+                <div class="step-icon" id="icon-fertig">✓</div>
+                <div class="step-text">Fertig</div>
+            </div>
+        </div>
+
+        <div class="spinner"></div>
+
+        <div class="status-text" id="status-text">Status: Wird gestartet...</div>
+        <div class="time-estimate" id="time-estimate">Geschätzte Zeit: ~2-3 Minuten</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://lead-er.app.n8n.cloud/webhook';
+        const POLL_INTERVAL = 10000; // 10 seconds
+
+        const sessionId = sessionStorage.getItem('session_id');
+        const statusText = document.getElementById('status-text');
+        const timeEstimate = document.getElementById('time-estimate');
+
+        const steps = ['recherche', 'analyse', 'enrichment', 'fertig'];
+        let currentStepIndex = 0;
+        let pollCount = 0;
+
+        // Status polling
+        async function checkStatus() {
+            if (!sessionId) {
+                alert('Session nicht gefunden');
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/status?session=${sessionId}`);
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+
+                if (data.status === 'completed') {
+                    markAllStepsComplete();
+                    sessionStorage.setItem('results_data', JSON.stringify(data));
+                    
+                    setTimeout(() => {
+                        window.location.href = '/results.html';
+                    }, 1000);
+
+                } else if (data.status === 'running') {
+                    updateProgress();
+                    pollCount++;
+                    setTimeout(checkStatus, POLL_INTERVAL);
+
+                } else if (data.status === 'error') {
+                    statusText.textContent = 'Status: Fehler aufgetreten';
+                    statusText.style.color = '#ef4444';
+                    alert('Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
+
+                } else {
+                    statusText.textContent = 'Status: Wird gestartet...';
+                    setTimeout(checkStatus, POLL_INTERVAL);
+                }
+
+            } catch (error) {
+                console.error('Status check error:', error);
+                statusText.textContent = 'Status: Verbindungsfehler';
+                setTimeout(checkStatus, POLL_INTERVAL * 2);
+            }
+        }
+
+        function updateProgress() {
+            // Simulate progress
+            if (pollCount % 2 === 0 && currentStepIndex < steps.length - 1) {
+                if (currentStepIndex > 0) {
+                    markStepComplete(steps[currentStepIndex - 1]);
+                }
+                currentStepIndex++;
+                markStepActive(steps[currentStepIndex]);
+            }
+
+            const stepTexts = {
+                0: 'Recherche läuft...',
+                1: 'Daten werden analysiert...',
+                2: 'Kontaktdaten werden angereichert...',
+                3: 'Fast fertig...'
+            };
+
+            statusText.textContent = `Status: ${stepTexts[currentStepIndex]}`;
+        }
+
+        function markStepComplete(stepName) {
+            const stepEl = document.getElementById(`step-${stepName}`);
+            const iconEl = document.getElementById(`icon-${stepName}`);
+
+            if (stepEl && iconEl) {
+                stepEl.classList.add('complete');
+                stepEl.classList.remove('active');
+                iconEl.textContent = '✓';
+            }
+        }
+
+        function markStepActive(stepName) {
+            const stepEl = document.getElementById(`step-${stepName}`);
+
+            if (stepEl) {
+                stepEl.classList.add('active');
+            }
+        }
+
+        function markAllStepsComplete() {
+            steps.forEach(step => markStepComplete(step));
+            statusText.textContent = 'Status: Abgeschlossen!';
+            statusText.style.color = '#10b981';
+        }
+
+        // Initialize
+        if (!sessionId) {
+            alert('Session nicht gefunden');
+            window.location.href = '/';
+        } else {
+            markStepActive('recherche');
+            setTimeout(checkStatus, 2000); // Start after 2s
+        }
+    </script>
+</body>
+</html>

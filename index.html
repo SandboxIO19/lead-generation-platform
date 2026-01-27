@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Generation Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+        }
+
+        .input-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .option-card h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #pdf-filename {
+            margin-top: 1rem;
+            color: #667eea;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        #manual-form-container {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        #manual-form-container.active {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .required {
+            color: #e53e3e;
+        }
+
+        .back-btn {
+            background: #e0e0e0;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .back-btn:hover {
+            background: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lead Generation Platform</h1>
+        <p class="subtitle">Finde die perfekten Käufer für dein Unternehmen</p>
+
+        <div class="input-options" id="input-options">
+            <div class="option-card">
+                <div class="icon">📄</div>
+                <h2>PDF Teaser hochladen</h2>
+                <button class="btn" id="pdf-upload-btn">Datei wählen</button>
+                <div id="pdf-filename" style="display: none;"></div>
+            </div>
+
+            <div class="option-card">
+                <div class="icon">✍️</div>
+                <h2>Formular ausfüllen</h2>
+                <button class="btn" id="form-start-btn">Jetzt starten</button>
+            </div>
+        </div>
+
+        <div id="manual-form-container">
+            <button class="btn back-btn" id="back-btn">← Zurück</button>
+            
+            <form id="company-form">
+                <div class="form-section">
+                    <h3>PFLICHTFELDER <span class="required">*</span></h3>
+                    
+                    <div class="form-group">
+                        <label>Branche <span class="required">*</span></label>
+                        <select id="branche" required>
+                            <option value="">Bitte wählen...</option>
+                            <option value="Software & SaaS">Software & SaaS</option>
+                            <option value="Fintech">Fintech</option>
+                            <option value="E-Commerce & Retail">E-Commerce & Retail</option>
+                            <option value="Manufacturing & Industrie">Manufacturing & Industrie</option>
+                            <option value="Healthcare & Medizin">Healthcare & Medizin</option>
+                            <option value="Business Services">Business Services</option>
+                            <option value="IT Services">IT Services</option>
+                            <option value="Logistik & Transport">Logistik & Transport</option>
+                            <option value="Food & Beverage">Food & Beverage</option>
+                            <option value="Immobilien">Immobilien</option>
+                            <option value="Automotive">Automotive</option>
+                            <option value="Energy & Utilities">Energy & Utilities</option>
+                            <option value="Medien & Marketing">Medien & Marketing</option>
+                            <option value="Bildung">Bildung</option>
+                            <option value="Sonstige">Sonstige</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Geografischer Fokus <span class="required">*</span></label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="geo-fokus" value="Deutschland" id="geo-de">
+                                <label for="geo-de">Deutschland</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="geo-fokus" value="DACH" id="geo-dach">
+                                <label for="geo-dach">DACH</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="geo-fokus" value="Europa" id="geo-eu">
+                                <label for="geo-eu">Europa</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="geo-fokus" value="Global" id="geo-global">
+                                <label for="geo-global">Global</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Revenue Range <span class="required">*</span></label>
+                        <select id="revenue" required>
+                            <option value="">Bitte wählen...</option>
+                            <option value="<1">< 1 Mio EUR</option>
+                            <option value="1-3">1-3 Mio EUR</option>
+                            <option value="3-10">3-10 Mio EUR</option>
+                            <option value="10-30">10-30 Mio EUR</option>
+                            <option value="30-50">30-50 Mio EUR</option>
+                            <option value="50-100">50-100 Mio EUR</option>
+                            <option value="100+">100+ Mio EUR</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>OPTIONAL (verbessert Lead-Qualität)</h3>
+                    
+                    <div class="form-group">
+                        <label>Wachstumsrate</label>
+                        <select id="wachstum">
+                            <option value="">Bitte wählen...</option>
+                            <option value="Schnelles Wachstum">Schnelles Wachstum (>30% YoY)</option>
+                            <option value="Moderates Wachstum">Moderates Wachstum (10-30%)</option>
+                            <option value="Stabiles Wachstum">Stabiles Wachstum (<10%)</option>
+                            <option value="EBITDA-positiv">EBITDA-positiv</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Geschäftsmodell</label>
+                        <select id="geschaeftsmodell">
+                            <option value="">Bitte wählen...</option>
+                            <option value="B2B">B2B</option>
+                            <option value="B2C">B2C</option>
+                            <option value="B2B2C">B2B2C</option>
+                            <option value="SaaS">SaaS</option>
+                            <option value="Marketplace">Marketplace</option>
+                            <option value="E-Commerce">E-Commerce</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Besondere Stärken/USPs</label>
+                        <textarea id="usps" placeholder="z.B. Marktführer DACH, proprietäre KI-Technologie..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>KÄUFER-PRÄFERENZEN (optional)</h3>
+                    
+                    <div class="form-group">
+                        <label>Käufertyp</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="kaeufertyp" value="PE/VC" id="buyer-pe">
+                                <label for="buyer-pe">PE/VC</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="kaeufertyp" value="Strategisch" id="buyer-strat">
+                                <label for="buyer-strat">Strategisch</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="kaeufertyp" value="Beide" id="buyer-both">
+                                <label for="buyer-both">Beide</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" id="submit-form-btn">Absenden</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://lead-er.app.n8n.cloud/webhook';
+
+        // Hidden file input
+        const pdfInput = document.createElement('input');
+        pdfInput.type = 'file';
+        pdfInput.accept = 'application/pdf';
+        pdfInput.style.display = 'none';
+        document.body.appendChild(pdfInput);
+
+        // Elements
+        const pdfUploadBtn = document.getElementById('pdf-upload-btn');
+        const pdfFilename = document.getElementById('pdf-filename');
+        const formStartBtn = document.getElementById('form-start-btn');
+        const inputOptions = document.getElementById('input-options');
+        const manualFormContainer = document.getElementById('manual-form-container');
+        const backBtn = document.getElementById('back-btn');
+        const companyForm = document.getElementById('company-form');
+
+        // PDF Upload
+        pdfUploadBtn.onclick = () => pdfInput.click();
+
+        pdfInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.type !== 'application/pdf') {
+                alert('Bitte nur PDF-Dateien hochladen');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('PDF zu groß (max 10MB)');
+                return;
+            }
+
+            pdfFilename.textContent = file.name;
+            pdfFilename.style.display = 'block';
+            pdfUploadBtn.textContent = 'Wird hochgeladen...';
+            pdfUploadBtn.disabled = true;
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    const base64 = reader.result.split(',')[1];
+
+                    const response = await fetch(`${API_BASE}/submit-teaser`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            source: 'pdf_upload',
+                            has_pdf: true,
+                            pdf_data: base64,
+                            pdf_filename: file.name
+                        })
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                    const data = await response.json();
+                    sessionStorage.setItem('session_id', data.session_id);
+                    sessionStorage.setItem('quality_data', JSON.stringify(data));
+                    window.location.href = '/quality-check.html';
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Fehler beim Upload. Bitte versuche es erneut.');
+                pdfUploadBtn.textContent = 'Datei wählen';
+                pdfUploadBtn.disabled = false;
+                pdfFilename.style.display = 'none';
+            }
+        };
+
+        // Show/Hide Form
+        formStartBtn.onclick = () => {
+            inputOptions.style.display = 'none';
+            manualFormContainer.classList.add('active');
+        };
+
+        backBtn.onclick = () => {
+            manualFormContainer.classList.remove('active');
+            inputOptions.style.display = 'grid';
+        };
+
+        // Form Submit
+        companyForm.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submit-form-btn');
+            submitBtn.textContent = 'Wird verarbeitet...';
+            submitBtn.disabled = true;
+
+            const formData = {
+                source: 'manual_form',
+                has_pdf: false,
+                branche: document.getElementById('branche').value,
+                geo_fokus: Array.from(document.querySelectorAll('input[name="geo-fokus"]:checked')).map(cb => cb.value),
+                revenue: document.getElementById('revenue').value,
+                wachstum: document.getElementById('wachstum').value || null,
+                geschaeftsmodell: document.getElementById('geschaeftsmodell').value || null,
+                usps: document.getElementById('usps').value || null,
+                kaeufertyp: Array.from(document.querySelectorAll('input[name="kaeufertyp"]:checked')).map(cb => cb.value)
+            };
+
+            if (!formData.branche || !formData.geo_fokus.length || !formData.revenue) {
+                alert('Bitte fülle alle Pflichtfelder aus');
+                submitBtn.textContent = 'Absenden';
+                submitBtn.disabled = false;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/submit-teaser`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+                sessionStorage.setItem('session_id', data.session_id);
+                sessionStorage.setItem('quality_data', JSON.stringify(data));
+                window.location.href = '/quality-check.html';
+            } catch (error) {
+                console.error('Form error:', error);
+                alert('Fehler beim Absenden. Bitte versuche es erneut.');
+                submitBtn.textContent = 'Absenden';
+                submitBtn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Lead Generation Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f9fafb;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2rem;
+        }
+
+        .lead-count {
+            font-size: 1.2rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .download-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .download-btn:hover {
+            background: #5568d3;
+        }
+
+        .results-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f3f4f6;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .company-website {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-pe {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-strategic {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .score {
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .score-high {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .score-medium {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .score-low {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .why-fit {
+            font-size: 0.9rem;
+            color: #555;
+            max-width: 300px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+        }
+
+        .empty-state h3 {
+            color: #555;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Deine Lead-Ergebnisse</h1>
+                <div class="lead-count" id="lead-count">Gefundene Leads: --</div>
+            </div>
+            <button class="download-btn" id="download-btn">📥 Als Excel</button>
+        </div>
+
+        <div class="results-table-container">
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th>Firma</th>
+                        <th>Typ</th>
+                        <th>Fit Score</th>
+                        <th>Feasibility</th>
+                        <th>E-Mail</th>
+                        <th>Telefon</th>
+                        <th>Why Fit</th>
+                    </tr>
+                </thead>
+                <tbody id="results-tbody">
+                    <tr>
+                        <td colspan="7" class="loading">Lädt Ergebnisse...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://lead-er.app.n8n.cloud/webhook';
+        const sessionId = sessionStorage.getItem('session_id');
+        const resultsData = JSON.parse(sessionStorage.getItem('results_data') || '{}');
+
+        const leadCount = document.getElementById('lead-count');
+        const downloadBtn = document.getElementById('download-btn');
+        const resultsTbody = document.getElementById('results-tbody');
+
+        async function loadResults() {
+            try {
+                let data = resultsData;
+
+                // If no cached data, fetch from API
+                if (!data.lead_count) {
+                    const response = await fetch(`${API_BASE}/status?session=${sessionId}`);
+                    if (!response.ok) throw new Error('Failed to fetch results');
+                    
+                    data = await response.json();
+                    sessionStorage.setItem('results_data', JSON.stringify(data));
+                }
+
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Load results error:', error);
+                resultsTbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <h3>Fehler beim Laden der Ergebnisse</h3>
+                            <p>Bitte versuche es erneut oder kontaktiere den Support.</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function displayResults(data) {
+            const count = data.lead_count || 0;
+            leadCount.textContent = `Gefundene Leads: ${count}`;
+
+            // Check if we have leads data
+            if (!data.leads || data.leads.length === 0) {
+                resultsTbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <h3>Keine Leads gefunden</h3>
+                            <p>Versuche es mit anderen Parametern erneut.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Populate table
+            resultsTbody.innerHTML = data.leads.map(lead => `
+                <tr>
+                    <td>
+                        <div class="company-name">${lead.name || 'N/A'}</div>
+                        ${lead.website ? `<div class="company-website">${lead.website}</div>` : ''}
+                    </td>
+                    <td>
+                        <span class="badge ${lead.buyer_type === 'PE' || lead.buyer_type?.includes('PE') ? 'badge-pe' : 'badge-strategic'}">
+                            ${lead.buyer_type || 'N/A'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="score ${getScoreClass(lead.buyer_fit_score)}">
+                            ${lead.buyer_fit_score || 'N/A'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="score ${getScoreClass(lead.lead_feasibility_score)}">
+                            ${lead.lead_feasibility_score || 'N/A'}
+                        </span>
+                    </td>
+                    <td>${lead.email || 'Nicht gefunden'}</td>
+                    <td>${lead.telefon || lead.phone || 'Nicht gefunden'}</td>
+                    <td>
+                        <div class="why-fit">${lead.why_fit || 'N/A'}</div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getScoreClass(score) {
+            if (!score) return '';
+            const numScore = Number(score);
+            if (numScore >= 70) return 'score-high';
+            if (numScore >= 40) return 'score-medium';
+            return 'score-low';
+        }
+
+        // Download handler
+        downloadBtn.onclick = () => {
+            if (resultsData.results && resultsData.results.sheet_url) {
+                window.open(resultsData.results.sheet_url, '_blank');
+            } else {
+                alert('Download-Link nicht verfügbar');
+            }
+        };
+
+        // Initialize
+        if (!sessionId) {
+            alert('Session nicht gefunden');
+            window.location.href = '/';
+        } else {
+            loadResults();
+        }
+    </script>
+</body>
+</html>
