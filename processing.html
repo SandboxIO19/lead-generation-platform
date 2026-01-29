@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #FAFAF9;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -27,7 +27,8 @@
             background: white;
             border-radius: 12px;
             padding: 3rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e0e0e0;
             text-align: center;
         }
 
@@ -108,7 +109,7 @@
             height: 50px;
             margin: 2rem auto;
             border: 4px solid #f3f4f6;
-            border-top: 4px solid #667eea;
+            border-top: 4px solid #2c3e50;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -116,6 +117,17 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .progress-steps {
+                flex-wrap: wrap;
+                gap: 2rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -154,6 +166,7 @@
     <script>
         const API_BASE = 'https://lead-er.app.n8n.cloud/webhook';
         const POLL_INTERVAL = 10000; // 10 seconds
+        const MAX_RETRIES = 3;
 
         const sessionId = sessionStorage.getItem('session_id');
         const statusText = document.getElementById('status-text');
@@ -162,6 +175,7 @@
         const steps = ['recherche', 'analyse', 'enrichment', 'fertig'];
         let currentStepIndex = 0;
         let pollCount = 0;
+        let retryCount = 0;
 
         // Status polling
         async function checkStatus() {
@@ -174,9 +188,14 @@
             try {
                 const response = await fetch(`${API_BASE}/status?session=${sessionId}`);
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
 
                 const data = await response.json();
+                
+                // Reset retry count on successful response
+                retryCount = 0;
 
                 if (data.status === 'completed') {
                     markAllStepsComplete();
@@ -197,14 +216,26 @@
                     alert('Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
 
                 } else {
-                    statusText.textContent = 'Status: Wird gestartet...';
+                    // Status: ready, processing, etc.
+                    if (pollCount === 0) {
+                        statusText.textContent = 'Status: Wird gestartet...';
+                    }
                     setTimeout(checkStatus, POLL_INTERVAL);
                 }
 
             } catch (error) {
                 console.error('Status check error:', error);
-                statusText.textContent = 'Status: Verbindungsfehler';
-                setTimeout(checkStatus, POLL_INTERVAL * 2);
+                retryCount++;
+                
+                // Only show error after multiple retries
+                if (retryCount >= MAX_RETRIES) {
+                    statusText.textContent = 'Status: Verbindungsfehler - Versuche erneut...';
+                    statusText.style.color = '#f59e0b';
+                }
+                
+                // Continue polling with exponential backoff
+                const backoffTime = POLL_INTERVAL * Math.min(retryCount, 3);
+                setTimeout(checkStatus, backoffTime);
             }
         }
 
@@ -226,6 +257,7 @@
             };
 
             statusText.textContent = `Status: ${stepTexts[currentStepIndex]}`;
+            statusText.style.color = '#555';
         }
 
         function markStepComplete(stepName) {
