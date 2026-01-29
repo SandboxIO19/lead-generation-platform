@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #FAFAF9;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -27,7 +27,8 @@
             background: white;
             border-radius: 12px;
             padding: 3rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e0e0e0;
         }
 
         .score-header {
@@ -124,12 +125,12 @@
         }
 
         .btn-primary {
-            background: #667eea;
+            background: #2c3e50;
             color: white;
         }
 
         .btn-primary:hover {
-            background: #5568d3;
+            background: #1a252f;
         }
 
         .btn:disabled {
@@ -143,6 +144,16 @@
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
