@@ -398,6 +398,81 @@
         pdfInput.style.display = 'none';
         document.body.appendChild(pdfInput);
 
+        // Check for edit mode and prefill form
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const editMode = urlParams.get('edit');
+            
+            if (editMode === 'true') {
+                const prefillData = JSON.parse(sessionStorage.getItem('prefill_data') || '{}');
+                
+                if (Object.keys(prefillData).length > 0) {
+                    // Show manual form automatically
+                    document.getElementById('input-options').style.display = 'none';
+                    document.getElementById('manual-form-container').classList.add('active');
+                    
+                    // Prefill all form fields
+                    const fieldMapping = {
+                        'branche': prefillData.branche || prefillData.industry,
+                        'revenue': prefillData.revenue,
+                        'wachstum': prefillData.wachstum,
+                        'geschaeftsmodell': prefillData.geschaeftsmodell || prefillData.business_description,
+                        'usps': prefillData.usps,
+                        'ticket_size': prefillData.ticket_size,
+                        'kaeufer_groesse': prefillData.kaeufer_groesse
+                    };
+                    
+                    // Prefill text fields and selects
+                    Object.keys(fieldMapping).forEach(fieldId => {
+                        const element = document.getElementById(fieldId);
+                        if (element && fieldMapping[fieldId]) {
+                            element.value = fieldMapping[fieldId];
+                        }
+                    });
+                    
+                    // Prefill checkboxes for geo_fokus
+                    if (prefillData.geo_fokus && Array.isArray(prefillData.geo_fokus)) {
+                        prefillData.geo_fokus.forEach(value => {
+                            const checkbox = document.querySelector(`input[name="geo-fokus"][value="${value}"]`);
+                            if (checkbox) checkbox.checked = true;
+                        });
+                    } else if (prefillData.geographic_focus) {
+                        // Fallback for different field name
+                        const geoValues = prefillData.geographic_focus.split(',').map(v => v.trim());
+                        geoValues.forEach(value => {
+                            const checkbox = document.querySelector(`input[name="geo-fokus"][value="${value}"]`);
+                            if (checkbox) checkbox.checked = true;
+                        });
+                    }
+                    
+                    // Prefill checkboxes for kaeufertyp
+                    if (prefillData.kaeufertyp && Array.isArray(prefillData.kaeufertyp)) {
+                        prefillData.kaeufertyp.forEach(value => {
+                            const checkbox = document.querySelector(`input[name="kaeufertyp"][value="${value}"]`);
+                            if (checkbox) checkbox.checked = true;
+                        });
+                    } else if (prefillData.target_buyer_type) {
+                        // Fallback for different field name
+                        const buyerValues = prefillData.target_buyer_type.split(',').map(v => v.trim());
+                        buyerValues.forEach(value => {
+                            const checkbox = document.querySelector(`input[name="kaeufertyp"][value="${value}"]`);
+                            if (checkbox) checkbox.checked = true;
+                        });
+                    }
+                    
+                    // Show success message
+                    const formContainer = document.getElementById('manual-form-container');
+                    const successMsg = document.createElement('div');
+                    successMsg.style.cssText = 'background: #d1fae5; color: #065f46; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;';
+                    successMsg.textContent = '✓ Deine Daten wurden geladen - Ergänze jetzt die fehlenden Felder';
+                    formContainer.insertBefore(successMsg, formContainer.firstChild);
+                    
+                    // Remove message after 3 seconds
+                    setTimeout(() => successMsg.remove(), 3000);
+                }
+            }
+        });
+
         // Elements
         const pdfUploadBtn = document.getElementById('pdf-upload-btn');
         const pdfFilename = document.getElementById('pdf-filename');
@@ -495,6 +570,16 @@
                 kaeufer_groesse: document.getElementById('kaeufer_groesse').value || null
             };
 
+            // Check if this is an update (edit mode)
+            const existingSessionId = sessionStorage.getItem('session_id');
+            const urlParams = new URLSearchParams(window.location.search);
+            const editMode = urlParams.get('edit');
+            
+            if (editMode === 'true' && existingSessionId) {
+                formData.session_id = existingSessionId;
+                console.log('Update mode - session_id:', existingSessionId);
+            }
+
             if (!formData.branche || !formData.geo_fokus.length || !formData.revenue) {
                 alert('Bitte fülle alle Pflichtfelder aus');
                 submitBtn.textContent = 'Absenden';
@@ -512,6 +597,10 @@
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const data = await response.json();
+                
+                // Clean up prefill data after successful submit
+                sessionStorage.removeItem('prefill_data');
+                
                 sessionStorage.setItem('session_id', data.session_id);
                 sessionStorage.setItem('quality_data', JSON.stringify(data));
                 window.location.href = '/quality-check.html';
