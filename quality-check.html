@@ -286,10 +286,7 @@
             console.log('Parsed form data:', formData);
             
             // Speichere für Prefill mit session_id
-            sessionStorage.setItem('prefill_data', JSON.stringify({
-                ...formData,
-                session_id: sessionId
-            }));
+            sessionStorage.setItem('prefill_data', JSON.stringify(formData));
             
             window.location.href = '/index.html?edit=true';
         };
