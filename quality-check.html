@@ -268,32 +268,53 @@
 
         // Button handlers
         editBtn.onclick = () => {
-            // Parse input_data from qualityData
+            // Parse input_data from qualityData with DOUBLE-PARSE for double-encoded JSON
             let formData = null;
             
             if (qualityData.input_data) {
-                if (typeof qualityData.input_data === 'string') {
-                    formData = JSON.parse(qualityData.input_data);
-                } else {
-                    formData = qualityData.input_data;
+                let data = qualityData.input_data;
+                
+                // Parse first time
+                if (typeof data === 'string') {
+                    try {
+                        data = JSON.parse(data);
+                        console.log('First parse done, type:', typeof data);
+                    } catch (e) {
+                        console.error('First parse failed:', e);
+                    }
                 }
+                
+                // Parse SECOND time if still a string (double-encoded!)
+                if (typeof data === 'string') {
+                    try {
+                        data = JSON.parse(data);
+                        console.log('Second parse done, type:', typeof data);
+                    } catch (e) {
+                        console.error('Second parse failed:', e);
+                    }
+                }
+                
+                formData = data;
             }
             
-            if (!formData) {
-                alert('Keine Formulardaten gefunden');
+            if (!formData || typeof formData !== 'object' || Array.isArray(formData)) {
+                console.error('Invalid formData:', formData);
+                alert('Fehler beim Laden der Formulardaten');
                 return;
             }
             
             // Debug
-            console.log('Saving prefill_data:', formData);
+            console.log('Final formData:', formData);
+            console.log('Has branche?', formData.hasOwnProperty('branche'));
+            console.log('Branche value:', formData.branche);
             
-            // Speichere als JSON-String (NICHT mit Spread!)
+            // Speichere als JSON-String
             sessionStorage.setItem('prefill_data', JSON.stringify(formData));
             
             // Verify
             const verify = JSON.parse(sessionStorage.getItem('prefill_data'));
-            console.log('Verified prefill_data:', verify);
-            console.log('Has branche?', verify.hasOwnProperty('branche'));
+            console.log('Verified prefill_data type:', typeof verify);
+            console.log('Verified has branche?', verify.hasOwnProperty('branche'));
             
             window.location.href = '/index.html?edit=true';
         };
