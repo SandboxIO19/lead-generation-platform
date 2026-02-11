@@ -267,23 +267,28 @@
         }
 
         // Button handlers
-        editBtn.onclick = () => {
-    // Hole die ORIGINAL session-Daten aus sessionStorage
-    const sessionData = JSON.parse(sessionStorage.getItem('quality_data') || '{}');
+       editBtn.onclick = () => {
+    // Hole quality_data aus sessionStorage
+    const qualityDataStr = sessionStorage.getItem('quality_data');
+    const qualityData = JSON.parse(qualityDataStr);
     
-    // Extrahiere input_data (die eigentlichen Formulardaten)
+    // Parse input_data (ist ein JSON-String!)
     let formData = {};
-    
-    if (typeof sessionData.input_data === 'string') {
-        formData = JSON.parse(sessionData.input_data);
-    } else if (typeof sessionData.input_data === 'object') {
-        formData = sessionData.input_data;
+    if (qualityData.input_data) {
+        if (typeof qualityData.input_data === 'string') {
+            formData = JSON.parse(qualityData.input_data);
+        } else {
+            formData = qualityData.input_data;
+        }
     }
     
-    // Speichere die Formulardaten fürs Prefilling
+    // Debug
+    console.log('Parsed form data:', formData);
+    
+    // Speichere für Prefill mit session_id
     sessionStorage.setItem('prefill_data', JSON.stringify({
         ...formData,
-        session_id: sessionId  // Session ID mitgeben für Edit Mode
+        session_id: sessionId
     }));
     
     window.location.href = '/index.html?edit=true';
