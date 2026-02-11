@@ -267,34 +267,36 @@
         }
 
         // Button handlers
-editBtn.onclick = () => {
-    // Hole quality_data aus sessionStorage
-    const qualityDataStr = sessionStorage.getItem('quality_data');
-    const qualityData = JSON.parse(qualityDataStr);
-    
-    // Parse input_data (ist ein JSON-String!)
-    let formData = {};
-    if (qualityData.input_data) {
-        if (typeof qualityData.input_data === 'string') {
-            formData = JSON.parse(qualityData.input_data);
-        } else {
-            formData = qualityData.input_data;
-        }
-    }
-    
-    // Füge session_id hinzu falls nicht vorhanden
-    if (!formData.session_id) {
-        formData.session_id = sessionId;
-    }
-    
-    // Debug
-    console.log('Parsed form data:', formData);
-    
-    // Speichere für Prefill
-    sessionStorage.setItem('prefill_data', JSON.stringify(formData));
-    
-    window.location.href = '/index.html?edit=true';
-};
+        editBtn.onclick = () => {
+            // Parse input_data from qualityData
+            let formData = null;
+            
+            if (qualityData.input_data) {
+                if (typeof qualityData.input_data === 'string') {
+                    formData = JSON.parse(qualityData.input_data);
+                } else {
+                    formData = qualityData.input_data;
+                }
+            }
+            
+            if (!formData) {
+                alert('Keine Formulardaten gefunden');
+                return;
+            }
+            
+            // Debug
+            console.log('Saving prefill_data:', formData);
+            
+            // Speichere als JSON-String (NICHT mit Spread!)
+            sessionStorage.setItem('prefill_data', JSON.stringify(formData));
+            
+            // Verify
+            const verify = JSON.parse(sessionStorage.getItem('prefill_data'));
+            console.log('Verified prefill_data:', verify);
+            console.log('Has branche?', verify.hasOwnProperty('branche'));
+            
+            window.location.href = '/index.html?edit=true';
+        };
 
         executeBtn.onclick = async () => {
             if (!sessionId) {
