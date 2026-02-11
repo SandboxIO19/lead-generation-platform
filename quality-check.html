@@ -267,32 +267,32 @@
         }
 
         // Button handlers
-       editBtn.onclick = () => {
-    // Hole quality_data aus sessionStorage
-    const qualityDataStr = sessionStorage.getItem('quality_data');
-    const qualityData = JSON.parse(qualityDataStr);
-    
-    // Parse input_data (ist ein JSON-String!)
-    let formData = {};
-    if (qualityData.input_data) {
-        if (typeof qualityData.input_data === 'string') {
-            formData = JSON.parse(qualityData.input_data);
-        } else {
-            formData = qualityData.input_data;
-        }
-    }
-    
-    // Debug
-    console.log('Parsed form data:', formData);
-    
-    // Speichere für Prefill mit session_id
-    sessionStorage.setItem('prefill_data', JSON.stringify({
-        ...formData,
-        session_id: sessionId
-    }));
-    
-    window.location.href = '/index.html?edit=true';
-};
+        editBtn.onclick = () => {
+            // Hole quality_data aus sessionStorage
+            const qualityDataStr = sessionStorage.getItem('quality_data');
+            const qualityData = JSON.parse(qualityDataStr);
+            
+            // Parse input_data (ist ein JSON-String!)
+            let formData = {};
+            if (qualityData.input_data) {
+                if (typeof qualityData.input_data === 'string') {
+                    formData = JSON.parse(qualityData.input_data);
+                } else {
+                    formData = qualityData.input_data;
+                }
+            }
+            
+            // Debug
+            console.log('Parsed form data:', formData);
+            
+            // Speichere für Prefill mit session_id
+            sessionStorage.setItem('prefill_data', JSON.stringify({
+                ...formData,
+                session_id: sessionId
+            }));
+            
+            window.location.href = '/index.html?edit=true';
+        };
 
         executeBtn.onclick = async () => {
             if (!sessionId) {
