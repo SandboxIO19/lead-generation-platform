@@ -84,16 +84,23 @@
             font-weight: 600;
             color: #555;
             border-bottom: 2px solid #e5e7eb;
+            white-space: nowrap;
         }
 
         td {
             padding: 1rem;
             border-bottom: 1px solid #e5e7eb;
             color: #333;
+            vertical-align: top;
         }
 
-        tr:hover {
+        tr:hover > td {
             background: #f9fafb;
+        }
+
+        /* Accordion row should not re-trigger hover */
+        tr.accordion-row:hover > td {
+            background: transparent;
         }
 
         .company-name {
@@ -104,6 +111,7 @@
         .company-website {
             font-size: 0.85rem;
             color: #888;
+            margin-top: 2px;
         }
 
         .badge {
@@ -112,17 +120,16 @@
             font-size: 0.85rem;
             font-weight: 500;
             display: inline-block;
+            white-space: nowrap;
         }
 
-        .badge-pe {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .badge-strategic {
-            background: #fef3c7;
-            color: #92400e;
-        }
+        .badge-pe { background: #dbeafe; color: #1e40af; }
+        .badge-strategic { background: #fef3c7; color: #92400e; }
+        .badge-pe_buybuild { background: #ede9fe; color: #5b21b6; }
+        .badge-pe_buyout { background: #dbeafe; color: #1e40af; }
+        .badge-vc_growth { background: #d1fae5; color: #065f46; }
+        .badge-search_fund { background: #fce7f3; color: #9d174d; }
+        .badge-holdco { background: #f3f4f6; color: #374151; }
 
         .score {
             font-weight: 600;
@@ -131,25 +138,162 @@
             display: inline-block;
         }
 
-        .score-high {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .score-medium {
-            background: #fed7aa;
-            color: #92400e;
-        }
-
-        .score-low {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+        .score-high { background: #d1fae5; color: #065f46; }
+        .score-medium { background: #fed7aa; color: #92400e; }
+        .score-low { background: #fee2e2; color: #991b1b; }
 
         .why-fit {
             font-size: 0.9rem;
             color: #555;
-            max-width: 300px;
+            max-width: 280px;
+        }
+
+        /* Contact cell */
+        .contact-primary {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .contact-email {
+            font-size: 0.9rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .contact-meta {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .hunter-confidence {
+            display: inline-block;
+            font-size: 0.75rem;
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            border-radius: 4px;
+            padding: 1px 6px;
+            margin-top: 2px;
+        }
+
+        /* Accordion toggle button */
+        .accordion-toggle {
+            background: none;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            color: #555;
+            cursor: pointer;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .accordion-toggle:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .accordion-toggle .arrow {
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .accordion-toggle.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Accordion content row */
+        .accordion-row td {
+            padding: 0;
+            border-bottom: none;
+        }
+
+        .accordion-content {
+            display: none;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0;
+        }
+
+        .accordion-content.open {
+            display: block;
+        }
+
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .contact-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.85rem;
+        }
+
+        .contact-card-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 2px;
+        }
+
+        .contact-card-position {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+        }
+
+        .contact-card-email {
+            color: #3b82f6;
+            word-break: break-all;
+            font-size: 0.8rem;
+        }
+
+        .contact-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .contact-type-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .type-personal { background: #dbeafe; color: #1e40af; }
+        .type-generic { background: #f3f4f6; color: #6b7280; }
+
+        .confidence-bar-wrap {
+            font-size: 0.7rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .confidence-bar {
+            width: 40px;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .confidence-bar-fill {
+            height: 100%;
+            background: #15803d;
+            border-radius: 2px;
         }
 
         .loading {
@@ -170,13 +314,8 @@
         }
 
         @media (max-width: 1200px) {
-            table {
-                font-size: 0.9rem;
-            }
-            
-            th, td {
-                padding: 0.75rem;
-            }
+            table { font-size: 0.9rem; }
+            th, td { padding: 0.75rem; }
         }
 
         @media (max-width: 768px) {
@@ -185,18 +324,9 @@
                 gap: 1rem;
                 align-items: flex-start;
             }
-            
-            .download-btn {
-                width: 100%;
-            }
-            
-            h1 {
-                font-size: 1.5rem;
-            }
-            
-            .results-table-container {
-                overflow-x: auto;
-            }
+            .download-btn { width: 100%; }
+            h1 { font-size: 1.5rem; }
+            .results-table-container { overflow-x: auto; }
         }
     </style>
 </head>
@@ -218,14 +348,13 @@
                         <th>Typ</th>
                         <th>Fit Score</th>
                         <th>Feasibility</th>
-                        <th>E-Mail</th>
-                        <th>Telefon</th>
+                        <th>Primärkontakt</th>
                         <th>Why Fit</th>
                     </tr>
                 </thead>
                 <tbody id="results-tbody">
                     <tr>
-                        <td colspan="7" class="loading">Lädt Ergebnisse...</td>
+                        <td colspan="6" class="loading">Lädt Ergebnisse...</td>
                     </tr>
                 </tbody>
             </table>
@@ -245,11 +374,9 @@
             try {
                 let data = resultsData;
 
-                // If no cached data, fetch from API
                 if (!data.lead_count) {
                     const response = await fetch(`${API_BASE}/status?session=${sessionId}`);
                     if (!response.ok) throw new Error('Failed to fetch results');
-                    
                     data = await response.json();
                     sessionStorage.setItem('results_data', JSON.stringify(data));
                 }
@@ -260,7 +387,7 @@
                 console.error('Load results error:', error);
                 resultsTbody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="empty-state">
+                        <td colspan="6" class="empty-state">
                             <h3>Fehler beim Laden der Ergebnisse</h3>
                             <p>Bitte versuche es erneut oder kontaktiere den Support.</p>
                         </td>
@@ -269,15 +396,66 @@
             }
         }
 
+        function getBadgeClass(buyerType) {
+            if (!buyerType) return 'badge-strategic';
+            const t = buyerType.toLowerCase();
+            if (t.includes('pe_buybuild')) return 'badge-pe_buybuild';
+            if (t.includes('pe_buyout')) return 'badge-pe_buyout';
+            if (t.includes('pe') || t.includes('vc')) return 'badge-pe';
+            if (t.includes('search')) return 'badge-search_fund';
+            if (t.includes('holdco')) return 'badge-holdco';
+            if (t.includes('vc_growth')) return 'badge-vc_growth';
+            return 'badge-strategic';
+        }
+
+        function getScoreClass(score) {
+            if (!score) return '';
+            const n = Number(score);
+            if (n >= 70) return 'score-high';
+            if (n >= 40) return 'score-medium';
+            return 'score-low';
+        }
+
+        function parseAlleKontakte(raw) {
+            if (!raw) return [];
+            try {
+                // Handle double-encoded string
+                let parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function renderContactCard(c) {
+            const conf = c.confidence || 0;
+            return `
+                <div class="contact-card">
+                    <div class="contact-card-name">${c.name || '—'}</div>
+                    <div class="contact-card-position">${c.position || 'Position unbekannt'}</div>
+                    <div class="contact-card-email">${c.email || '—'}</div>
+                    <div class="contact-card-footer">
+                        <span class="contact-type-badge type-${c.type || 'generic'}">${c.type || 'generic'}</span>
+                        <div class="confidence-bar-wrap">
+                            <div class="confidence-bar">
+                                <div class="confidence-bar-fill" style="width:${conf}%"></div>
+                            </div>
+                            ${conf}%
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function displayResults(data) {
             const count = data.lead_count || 0;
             leadCount.textContent = `Gefundene Leads: ${count}`;
 
-            // Check if we have leads data
             if (!data.leads || data.leads.length === 0) {
                 resultsTbody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="empty-state">
+                        <td colspan="6" class="empty-state">
                             <h3>Keine Leads gefunden</h3>
                             <p>Versuche es mit anderen Parametern erneut.</p>
                         </td>
@@ -286,43 +464,73 @@
                 return;
             }
 
-            // Populate table
-            resultsTbody.innerHTML = data.leads.map(lead => `
-                <tr>
-                    <td>
-                        <div class="company-name">${lead.name || 'N/A'}</div>
-                        ${lead.website ? `<div class="company-website">${lead.website}</div>` : ''}
-                    </td>
-                    <td>
-                        <span class="badge ${lead.buyer_type === 'PE' || lead.buyer_type?.includes('PE') ? 'badge-pe' : 'badge-strategic'}">
-                            ${lead.buyer_type || 'N/A'}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="score ${getScoreClass(lead.buyer_fit_score)}">
-                            ${lead.buyer_fit_score || 'N/A'}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="score ${getScoreClass(lead.lead_feasibility_score)}">
-                            ${lead.lead_feasibility_score || 'N/A'}
-                        </span>
-                    </td>
-                    <td>${lead.email || 'Nicht gefunden'}</td>
-                    <td>${lead.telefon || lead.phone || 'Nicht gefunden'}</td>
-                    <td>
-                        <div class="why-fit">${lead.why_fit || 'N/A'}</div>
-                    </td>
-                </tr>
-            `).join('');
+            let html = '';
+
+            data.leads.forEach((lead, idx) => {
+                const alleKontakte = parseAlleKontakte(lead.alle_kontakte);
+                const hasMultiple = alleKontakte.length > 1;
+                const accordionId = `acc-${idx}`;
+
+                html += `
+                    <tr>
+                        <td>
+                            <div class="company-name">${lead.name || 'N/A'}</div>
+                            ${lead.website ? `<div class="company-website">${lead.website}</div>` : ''}
+                        </td>
+                        <td>
+                            <span class="badge ${getBadgeClass(lead.buyer_type)}">
+                                ${lead.buyer_type || 'N/A'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="score ${getScoreClass(lead.buyer_fit_score)}">
+                                ${lead.buyer_fit_score ?? 'N/A'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="score ${getScoreClass(lead.lead_feasibility_score)}">
+                                ${lead.lead_feasibility_score ?? 'N/A'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="contact-primary">
+                                <div class="contact-email">${lead.email || 'Nicht gefunden'}</div>
+                                ${lead.kontakt_name ? `<div class="contact-meta">${lead.kontakt_name}</div>` : ''}
+                                ${lead.kontakt_position ? `<div class="contact-meta">${lead.kontakt_position}</div>` : ''}
+                                ${lead.hunter_confidence ? `<span class="hunter-confidence">Hunter ${lead.hunter_confidence}%</span>` : ''}
+                                ${hasMultiple ? `
+                                    <button class="accordion-toggle" onclick="toggleAccordion('${accordionId}', this)">
+                                        <span class="arrow">▼</span> ${alleKontakte.length} Kontakte
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="why-fit">${lead.why_fit || 'N/A'}</div>
+                        </td>
+                    </tr>
+                    ${hasMultiple ? `
+                    <tr class="accordion-row">
+                        <td colspan="6">
+                            <div class="accordion-content" id="${accordionId}">
+                                <div class="contacts-grid">
+                                    ${alleKontakte.map(renderContactCard).join('')}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    ` : ''}
+                `;
+            });
+
+            resultsTbody.innerHTML = html;
         }
 
-        function getScoreClass(score) {
-            if (!score) return '';
-            const numScore = Number(score);
-            if (numScore >= 70) return 'score-high';
-            if (numScore >= 40) return 'score-medium';
-            return 'score-low';
+        function toggleAccordion(id, btn) {
+            const content = document.getElementById(id);
+            const isOpen = content.classList.contains('open');
+            content.classList.toggle('open', !isOpen);
+            btn.classList.toggle('open', !isOpen);
         }
 
         // Download handler
@@ -334,7 +542,6 @@
             }
         };
 
-        // Initialize
         if (!sessionId) {
             alert('Session nicht gefunden');
             window.location.href = '/';
