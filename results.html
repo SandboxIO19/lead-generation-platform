@@ -5,276 +5,344 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Results - Lead Generation Platform</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #FAFAF9;
+            background: #F7F7F5;
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1300px; margin: 0 auto; }
 
         .header {
             background: white;
-            padding: 2rem;
+            padding: 1.5rem 2rem;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border: 2px solid #e0e0e0;
-            margin-bottom: 2rem;
+            border: 1px solid #E5E5E3;
+            margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        h1 {
-            color: #333;
-            font-size: 2rem;
-        }
-
-        .lead-count {
-            font-size: 1.2rem;
-            color: #2c3e50;
-            font-weight: 600;
-        }
+        .header h1 { font-size: 1.4rem; color: #1a1a1a; font-weight: 700; }
+        .lead-count { font-size: 0.9rem; color: #888; margin-top: 2px; }
 
         .download-btn {
-            background: #2c3e50;
+            background: #1a1a1a;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: background 0.2s;
         }
+        .download-btn:hover { background: #333; }
 
-        .download-btn:hover {
-            background: #1a252f;
-        }
-
-        .results-table-container {
+        /* Table */
+        .table-wrap {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border: 2px solid #e0e0e0;
+            border: 1px solid #E5E5E3;
             overflow: hidden;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: #f3f4f6;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #F3F3F1; }
 
         th {
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             text-align: left;
+            font-size: 0.75rem;
             font-weight: 600;
-            color: #555;
-            border-bottom: 2px solid #e5e7eb;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #E5E5E3;
             white-space: nowrap;
         }
 
         td {
             padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            color: #333;
+            border-bottom: 1px solid #F0F0EE;
             vertical-align: top;
         }
 
-        tr:hover > td {
-            background: #f9fafb;
-        }
+        tr.lead-row:hover td { background: #FAFAF8; }
+        tr.lead-row.acq-yes td:first-child { border-left: 3px solid #22c55e; }
 
-        /* Accordion row should not re-trigger hover */
-        tr.accordion-row:hover > td {
-            background: transparent;
-        }
-
-        .company-name {
+        /* ── Col 1: Firma ── */
+        .firm-name {
             font-weight: 600;
-            color: #2c3e50;
+            color: #1a1a1a;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
         }
 
-        .company-website {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 2px;
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            display: inline-block;
-            white-space: nowrap;
-        }
-
-        .badge-pe { background: #dbeafe; color: #1e40af; }
-        .badge-strategic { background: #fef3c7; color: #92400e; }
-        .badge-pe_buybuild { background: #ede9fe; color: #5b21b6; }
-        .badge-pe_buyout { background: #dbeafe; color: #1e40af; }
-        .badge-vc_growth { background: #d1fae5; color: #065f46; }
-        .badge-search_fund { background: #fce7f3; color: #9d174d; }
-        .badge-holdco { background: #f3f4f6; color: #374151; }
-
-        .score {
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-
-        .score-high { background: #d1fae5; color: #065f46; }
-        .score-medium { background: #fed7aa; color: #92400e; }
-        .score-low { background: #fee2e2; color: #991b1b; }
-
-        .why-fit {
-            font-size: 0.9rem;
-            color: #555;
-            max-width: 280px;
-        }
-
-        /* Contact cell */
-        .contact-primary {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .contact-email {
-            font-size: 0.9rem;
-            color: #2c3e50;
-            font-weight: 500;
-        }
-
-        .contact-meta {
+        .firm-website {
             font-size: 0.8rem;
-            color: #888;
+            color: #3b82f6;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 6px;
         }
 
-        .hunter-confidence {
-            display: inline-block;
-            font-size: 0.75rem;
-            background: #f0fdf4;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
+        .firm-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 2px 7px;
             border-radius: 4px;
-            padding: 1px 6px;
-            margin-top: 2px;
+            font-weight: 500;
         }
 
-        /* Accordion toggle button */
-        .accordion-toggle {
+        .tag-sector-it      { background: #dbeafe; color: #1d4ed8; }
+        .tag-sector-fin     { background: #fef9c3; color: #854d0e; }
+        .tag-sector-ind     { background: #f3e8ff; color: #7c3aed; }
+        .tag-sector-health  { background: #dcfce7; color: #166534; }
+        .tag-sector-cons    { background: #ffedd5; color: #9a3412; }
+        .tag-sector-comm    { background: #e0f2fe; color: #0369a1; }
+        .tag-sector-default { background: #f3f4f6; color: #374151; }
+
+        .firm-branche {
+            font-size: 0.78rem;
+            color: #999;
+            font-style: italic;
+            margin-bottom: 4px;
+        }
+
+        /* Company description toggle */
+        .desc-toggle {
             background: none;
-            border: 1px solid #e5e7eb;
+            border: none;
+            padding: 0;
+            font-size: 0.75rem;
+            color: #aaa;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin-bottom: 2px;
+            transition: color 0.15s;
+        }
+        .desc-toggle:hover { color: #666; }
+        .desc-toggle .arrow { transition: transform 0.2s; display: inline-block; font-style: normal; }
+        .desc-toggle.open .arrow { transform: rotate(180deg); }
+
+        .firm-description {
+            display: none;
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 4px;
+            padding: 6px 8px;
+            background: #F7F7F5;
+            border-radius: 6px;
+            border-left: 2px solid #E5E5E3;
+        }
+        .firm-description.open { display: block; }
+
+        .contact-toggle {
+            margin-top: 8px;
+            background: none;
+            border: 1px solid #E5E5E3;
             border-radius: 6px;
             padding: 4px 10px;
-            font-size: 0.8rem;
-            color: #555;
+            font-size: 0.75rem;
+            color: #666;
             cursor: pointer;
-            margin-top: 6px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 4px;
             transition: all 0.15s;
+        }
+        .contact-toggle:hover { background: #F3F3F1; border-color: #ccc; }
+        .contact-toggle .arrow { transition: transform 0.2s; display: inline-block; }
+        .contact-toggle.open .arrow { transform: rotate(180deg); }
+
+        /* ── Col 2: Profil ── */
+        .profil-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 5px;
+            font-size: 0.82rem;
+            color: #444;
+        }
+
+        .profil-label {
+            color: #aaa;
+            font-size: 0.75rem;
+            min-width: 64px;
+        }
+
+        .badge {
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .badge-b2b   { background: #e0f2fe; color: #0369a1; }
+        .badge-b2c   { background: #fce7f3; color: #9d174d; }
+        .badge-b2b2c { background: #ede9fe; color: #5b21b6; }
+
+        .badge-family  { background: #f0fdf4; color: #166534; }
+        .badge-pe      { background: #dbeafe; color: #1e40af; }
+        .badge-vc      { background: #d1fae5; color: #065f46; }
+        .badge-listed  { background: #fef3c7; color: #92400e; }
+        .badge-sub     { background: #f3f4f6; color: #374151; }
+        .badge-unknown-e { background: #f9fafb; color: #9ca3af; }
+
+        .acq-yes-tag {
+            font-size: 0.72rem;
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+            border-radius: 4px;
+            padding: 2px 6px;
+        }
+
+        .revenue-val { color: #333; }
+        .revenue-val.low-conf { color: #bbb; font-style: italic; }
+
+        /* ── Col 3: Match ── */
+        .scores-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .score-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #F7F7F5;
+            border-radius: 8px;
+            padding: 6px 10px;
+            min-width: 52px;
+        }
+
+        .score-box .score-val {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .score-box .score-lbl {
+            font-size: 0.65rem;
+            color: #aaa;
+            margin-top: 2px;
             white-space: nowrap;
         }
 
-        .accordion-toggle:hover {
-            background: #f3f4f6;
-            border-color: #9ca3af;
-        }
+        .score-high   { color: #16a34a; }
+        .score-medium { color: #d97706; }
+        .score-low    { color: #dc2626; }
 
-        .accordion-toggle .arrow {
-            transition: transform 0.2s;
+        .buyer-type-badge {
+            font-size: 0.72rem;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-weight: 500;
             display: inline-block;
+            margin-bottom: 6px;
         }
 
-        .accordion-toggle.open .arrow {
-            transform: rotate(180deg);
+        .btype-pe_micro    { background: #dbeafe; color: #1e40af; }
+        .btype-pe_buybuild { background: #ede9fe; color: #5b21b6; }
+        .btype-pe_buyout   { background: #dbeafe; color: #1e40af; }
+        .btype-strategic   { background: #fef3c7; color: #92400e; }
+        .btype-vc_growth   { background: #d1fae5; color: #065f46; }
+        .btype-search_fund { background: #fce7f3; color: #9d174d; }
+        .btype-holdco      { background: #f3f4f6; color: #374151; }
+
+        .signal-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            color: #777;
         }
 
-        /* Accordion content row */
-        .accordion-row td {
-            padding: 0;
-            border-bottom: none;
+        .signal-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
+
+        .signal-explicit { background: #22c55e; }
+        .signal-implicit { background: #f59e0b; }
+        .signal-none     { background: #d1d5db; }
+
+        /* ── Col 4: Why Fit ── */
+        .why-fit-text {
+            font-size: 0.85rem;
+            color: #555;
+            line-height: 1.5;
+            max-width: 260px;
+        }
+
+        .signal-reason {
+            margin-top: 6px;
+            font-size: 0.75rem;
+            color: #aaa;
+            font-style: italic;
+            max-width: 260px;
+        }
+
+        /* ── Accordion ── */
+        .accordion-row td { padding: 0; border-bottom: none; }
+        tr.accordion-row:hover td { background: transparent; }
 
         .accordion-content {
             display: none;
-            background: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 0;
+            background: #F7F7F5;
+            border-bottom: 1px solid #E5E5E3;
+            padding: 14px 16px;
         }
+        .accordion-content.open { display: block; }
 
-        .accordion-content.open {
-            display: block;
-        }
-
-        .contacts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        .accordion-inner {
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
-            padding: 16px;
         }
 
         .contact-card {
             background: white;
-            border: 1px solid #e5e7eb;
+            border: 1px solid #E5E5E3;
             border-radius: 8px;
-            padding: 12px;
-            font-size: 0.85rem;
+            padding: 12px 14px;
+            min-width: 220px;
+            max-width: 280px;
+            font-size: 0.82rem;
         }
 
-        .contact-card-name {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 2px;
-        }
+        .cc-name  { font-weight: 600; color: #1a1a1a; margin-bottom: 1px; }
+        .cc-pos   { font-size: 0.75rem; color: #888; margin-bottom: 6px; }
+        .cc-email { color: #3b82f6; word-break: break-all; font-size: 0.78rem; }
 
-        .contact-card-position {
-            color: #666;
-            font-size: 0.8rem;
-            margin-bottom: 6px;
-        }
-
-        .contact-card-email {
-            color: #3b82f6;
-            word-break: break-all;
-            font-size: 0.8rem;
-        }
-
-        .contact-card-footer {
+        .cc-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 6px;
+            margin-top: 8px;
         }
 
-        .contact-type-badge {
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
+        .cc-type { font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; }
         .type-personal { background: #dbeafe; color: #1e40af; }
-        .type-generic { background: #f3f4f6; color: #6b7280; }
+        .type-generic  { background: #f3f4f6; color: #6b7280; }
 
-        .confidence-bar-wrap {
+        .cc-conf {
             font-size: 0.7rem;
             color: #888;
             display: flex;
@@ -282,272 +350,319 @@
             gap: 4px;
         }
 
-        .confidence-bar {
-            width: 40px;
-            height: 4px;
+        .conf-bar {
+            width: 36px; height: 3px;
             background: #e5e7eb;
             border-radius: 2px;
             overflow: hidden;
         }
 
-        .confidence-bar-fill {
+        .conf-fill {
             height: 100%;
-            background: #15803d;
+            background: #22c55e;
             border-radius: 2px;
         }
 
-        .loading {
+        /* States */
+        .loading, .empty-state {
             text-align: center;
             padding: 3rem;
             color: #888;
         }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #888;
-        }
-
-        .empty-state h3 {
-            color: #555;
-            margin-bottom: 1rem;
-        }
-
-        @media (max-width: 1200px) {
-            table { font-size: 0.9rem; }
-            th, td { padding: 0.75rem; }
-        }
+        .empty-state h3 { color: #555; margin-bottom: 1rem; }
 
         @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
+            .header { flex-direction: column; gap: 1rem; align-items: flex-start; }
             .download-btn { width: 100%; }
-            h1 { font-size: 1.5rem; }
-            .results-table-container { overflow-x: auto; }
+            h1 { font-size: 1.2rem; }
+            .table-wrap { overflow-x: auto; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div>
-                <h1>Deine Lead-Ergebnisse</h1>
-                <div class="lead-count" id="lead-count">Gefundene Leads: --</div>
-            </div>
-            <button class="download-btn" id="download-btn">📥 Als Excel</button>
-        </div>
+<div class="container">
 
-        <div class="results-table-container">
-            <table id="results-table">
-                <thead>
-                    <tr>
-                        <th>Firma</th>
-                        <th>Typ</th>
-                        <th>Fit Score</th>
-                        <th>Feasibility</th>
-                        <th>Primärkontakt</th>
-                        <th>Why Fit</th>
-                    </tr>
-                </thead>
-                <tbody id="results-tbody">
-                    <tr>
-                        <td colspan="6" class="loading">Lädt Ergebnisse...</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="header">
+        <div>
+            <h1>Deine Lead-Ergebnisse</h1>
+            <div class="lead-count" id="lead-count">Lädt...</div>
         </div>
+        <button class="download-btn" id="download-btn">📥 Als Excel</button>
     </div>
 
-    <script>
-        const API_BASE = 'https://leaderflow2.app.n8n.cloud/webhook';
-        const sessionId = sessionStorage.getItem('session_id');
-        const resultsData = JSON.parse(sessionStorage.getItem('results_data') || '{}');
+    <div class="table-wrap">
+        <table id="results-table">
+            <thead>
+                <tr>
+                    <th>Firma</th>
+                    <th>Profil</th>
+                    <th>Match</th>
+                    <th>Why Fit</th>
+                </tr>
+            </thead>
+            <tbody id="results-tbody">
+                <tr><td colspan="4" class="loading">Lädt Ergebnisse...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-        const leadCount = document.getElementById('lead-count');
-        const downloadBtn = document.getElementById('download-btn');
-        const resultsTbody = document.getElementById('results-tbody');
+<script>
+    const API_BASE = 'https://leaderflow2.app.n8n.cloud/webhook';
+    const sessionId = sessionStorage.getItem('session_id');
+    const resultsData = JSON.parse(sessionStorage.getItem('results_data') || '{}');
 
-        async function loadResults() {
-            try {
-                let data = resultsData;
-
-                if (!data.lead_count) {
-                    const response = await fetch(`${API_BASE}/status?session=${sessionId}`);
-                    if (!response.ok) throw new Error('Failed to fetch results');
-                    data = await response.json();
-                    sessionStorage.setItem('results_data', JSON.stringify(data));
-                }
-
-                displayResults(data);
-
-            } catch (error) {
-                console.error('Load results error:', error);
-                resultsTbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="empty-state">
-                            <h3>Fehler beim Laden der Ergebnisse</h3>
-                            <p>Bitte versuche es erneut oder kontaktiere den Support.</p>
-                        </td>
-                    </tr>
-                `;
+    async function loadResults() {
+        try {
+            let data = resultsData;
+            if (!data.lead_count) {
+                const response = await fetch(`${API_BASE}/status?session=${sessionId}`);
+                if (!response.ok) throw new Error('Failed to fetch');
+                data = await response.json();
+                sessionStorage.setItem('results_data', JSON.stringify(data));
             }
+            displayResults(data);
+        } catch (err) {
+            console.error(err);
+            document.getElementById('results-tbody').innerHTML = `
+                <tr><td colspan="4" class="empty-state">
+                    <h3>Fehler beim Laden</h3>
+                    <p>Bitte versuche es erneut oder kontaktiere den Support.</p>
+                </td></tr>`;
         }
+    }
 
-        function getBadgeClass(buyerType) {
-            if (!buyerType) return 'badge-strategic';
-            const t = buyerType.toLowerCase();
-            if (t.includes('pe_buybuild')) return 'badge-pe_buybuild';
-            if (t.includes('pe_buyout')) return 'badge-pe_buyout';
-            if (t.includes('pe') || t.includes('vc')) return 'badge-pe';
-            if (t.includes('search')) return 'badge-search_fund';
-            if (t.includes('holdco')) return 'badge-holdco';
-            if (t.includes('vc_growth')) return 'badge-vc_growth';
-            return 'badge-strategic';
-        }
+    function sectorTagClass(sector) {
+        if (!sector) return 'tag-sector-default';
+        const s = sector.toLowerCase();
+        if (s.includes('information')) return 'tag-sector-it';
+        if (s.includes('financial'))   return 'tag-sector-fin';
+        if (s.includes('industrial'))  return 'tag-sector-ind';
+        if (s.includes('health'))      return 'tag-sector-health';
+        if (s.includes('consumer'))    return 'tag-sector-cons';
+        if (s.includes('communication')) return 'tag-sector-comm';
+        return 'tag-sector-default';
+    }
 
-        function getScoreClass(score) {
-            if (!score) return '';
-            const n = Number(score);
-            if (n >= 70) return 'score-high';
-            if (n >= 40) return 'score-medium';
-            return 'score-low';
-        }
+    function scoreClass(n) {
+        if (!n && n !== 0) return '';
+        if (n >= 70) return 'score-high';
+        if (n >= 40) return 'score-medium';
+        return 'score-low';
+    }
 
-        function parseAlleKontakte(raw) {
-            if (!raw) return [];
-            try {
-                // Handle double-encoded string
-                let parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-                if (typeof parsed === 'string') parsed = JSON.parse(parsed);
-                return Array.isArray(parsed) ? parsed : [];
-            } catch (e) {
-                return [];
-            }
-        }
+    function eigentumsClass(e) {
+        const map = { 'family-owned': 'badge-family', 'pe-backed': 'badge-pe', 'vc-backed': 'badge-vc', 'publicly-listed': 'badge-listed', 'subsidiary': 'badge-sub' };
+        return map[e] || 'badge-unknown-e';
+    }
 
-        function renderContactCard(c) {
-            const conf = c.confidence || 0;
-            return `
-                <div class="contact-card">
-                    <div class="contact-card-name">${c.name || '—'}</div>
-                    <div class="contact-card-position">${c.position || 'Position unbekannt'}</div>
-                    <div class="contact-card-email">${c.email || '—'}</div>
-                    <div class="contact-card-footer">
-                        <span class="contact-type-badge type-${c.type || 'generic'}">${c.type || 'generic'}</span>
-                        <div class="confidence-bar-wrap">
-                            <div class="confidence-bar">
-                                <div class="confidence-bar-fill" style="width:${conf}%"></div>
-                            </div>
-                            ${conf}%
-                        </div>
-                    </div>
+    function eigentumsLabel(e) {
+        const map = { 'family-owned': 'Familienunternehmen', 'pe-backed': 'PE-backed', 'vc-backed': 'VC-backed', 'publicly-listed': 'Börsennotiert', 'subsidiary': 'Tochtergesellschaft' };
+        return map[e] || null;
+    }
+
+    function buyerTypeLabel(t) {
+        const map = { 'pe_micro': 'Micro PE', 'pe_buybuild': 'Buy & Build PE', 'pe_buyout': 'Buyout PE', 'strategic': 'Strategisch', 'vc_growth': 'VC Growth', 'search_fund': 'Search Fund', 'holdco': 'HoldCo' };
+        return map[t] || t;
+    }
+
+    function signalDot(s) {
+        if (s === 'explicit') return '<span class="signal-dot signal-explicit"></span>';
+        if (s === 'implicit') return '<span class="signal-dot signal-implicit"></span>';
+        return '<span class="signal-dot signal-none"></span>';
+    }
+
+    function signalLabel(s) {
+        if (s === 'explicit') return 'Explizites M&A Signal';
+        if (s === 'implicit') return 'Implizites Signal';
+        return 'Kein Signal';
+    }
+
+    function parseKontakte(raw) {
+        try {
+            let p = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            if (typeof p === 'string') p = JSON.parse(p);
+            return Array.isArray(p) ? p : [];
+        } catch { return []; }
+    }
+
+    function renderRow(lead, idx) {
+        const kontakte = parseKontakte(lead.alle_kontakte);
+        const hasKontakt = kontakte.length > 0 || lead.email;
+        const accId  = `acc-${idx}`;
+        const descId = `desc-${idx}`;
+        const isAcqYes = lead.akquisitionshistorie === 'yes';
+        const eigLabel = eigentumsLabel(lead.eigentumsstruktur);
+        const hasDesc  = lead.company_description && lead.company_description !== 'unknown';
+
+        // ── Profil col ──
+        const revenueHtml = lead.revenue_estimate
+            ? `<span class="revenue-val ${lead.revenue_confidence === 'low' ? 'low-conf' : ''}">€${lead.revenue_estimate}M</span>
+               ${lead.revenue_confidence === 'low' ? '<span style="font-size:0.7rem;color:#bbb">(geschätzt)</span>' : ''}`
+            : '';
+
+        const profilHtml = `
+            <div class="profil-row">
+                <span class="profil-label">Modell</span>
+                <span class="badge badge-${(lead.geschaeftsmodell||'').toLowerCase()}">${lead.geschaeftsmodell || '—'}</span>
+            </div>
+            ${lead.mitarbeiter_range && lead.mitarbeiter_range !== 'unknown' ? `
+            <div class="profil-row">
+                <span class="profil-label">Mitarbeiter</span>
+                <span>${lead.mitarbeiter_range}</span>
+            </div>` : ''}
+            ${revenueHtml ? `
+            <div class="profil-row">
+                <span class="profil-label">Umsatz</span>
+                ${revenueHtml}
+            </div>` : ''}
+            ${eigLabel ? `
+            <div class="profil-row">
+                <span class="profil-label">Eigentum</span>
+                <span class="badge ${eigentumsClass(lead.eigentumsstruktur)}">${eigLabel}</span>
+            </div>` : ''}
+            ${isAcqYes ? `
+            <div class="profil-row">
+                <span class="profil-label">M&A Hist.</span>
+                <span class="acq-yes-tag">✓ Aktiv</span>
+            </div>` : ''}
+        `;
+
+        // ── Match col ──
+        const matchHtml = `
+            <div class="scores-row">
+                <div class="score-box">
+                    <span class="score-val ${scoreClass(lead.buyer_fit_score)}">${lead.buyer_fit_score ?? '—'}</span>
+                    <span class="score-lbl">Fit</span>
                 </div>
-            `;
+                <div class="score-box">
+                    <span class="score-val ${scoreClass(lead.lead_feasibility_score)}">${lead.lead_feasibility_score ?? '—'}</span>
+                    <span class="score-lbl">Feasibility</span>
+                </div>
+            </div>
+            <div>
+                <span class="buyer-type-badge btype-${lead.buyer_type}">${buyerTypeLabel(lead.buyer_type)}</span>
+            </div>
+            <div class="signal-row">
+                ${signalDot(lead.buyer_signal)}
+                <span>${signalLabel(lead.buyer_signal)}</span>
+            </div>
+        `;
+
+        // ── Contact accordion ──
+        const contactCardsHtml = kontakte.length > 0
+            ? kontakte.map(c => `
+                <div class="contact-card">
+                    <div class="cc-name">${c.name || '—'}</div>
+                    <div class="cc-pos">${c.position || 'Position unbekannt'}</div>
+                    <div class="cc-email">${c.email || '—'}</div>
+                    <div class="cc-footer">
+                        <span class="cc-type type-${c.type || 'generic'}">${c.type || 'generic'}</span>
+                        ${c.confidence ? `
+                        <div class="cc-conf">
+                            <div class="conf-bar"><div class="conf-fill" style="width:${c.confidence}%"></div></div>
+                            Confidence ${c.confidence}%
+                        </div>` : ''}
+                    </div>
+                </div>`).join('')
+            : lead.email ? `
+                <div class="contact-card">
+                    <div class="cc-name">${lead.kontakt_name || '—'}</div>
+                    <div class="cc-pos">${lead.kontakt_position || 'Position unbekannt'}</div>
+                    <div class="cc-email">${lead.email}</div>
+                    <div class="cc-footer">
+                        <span class="cc-type type-personal">personal</span>
+                        ${lead.hunter_confidence ? `
+                        <div class="cc-conf">
+                            <div class="conf-bar"><div class="conf-fill" style="width:${lead.hunter_confidence}%"></div></div>
+                            Confidence ${lead.hunter_confidence}%
+                        </div>` : ''}
+                    </div>
+                </div>`
+            : '<span style="font-size:0.82rem;color:#aaa">Kein Kontakt gefunden</span>';
+
+        return `
+            <tr class="lead-row${isAcqYes ? ' acq-yes' : ''}">
+                <td>
+                    <div class="firm-name">${lead.name || 'N/A'}</div>
+                    ${lead.website ? `<a class="firm-website" href="${lead.website.startsWith('http') ? lead.website : 'https://' + lead.website}" target="_blank">${lead.website.replace(/^https?:\/\//,'')}</a>` : ''}
+                    <div class="firm-tags">
+                        ${lead.gics_sector && lead.gics_sector !== 'unknown' ? `<span class="tag ${sectorTagClass(lead.gics_sector)}">${lead.gics_sector}</span>` : ''}
+                        ${lead.hq_country ? `<span class="tag tag-sector-default">${lead.hq_country}</span>` : ''}
+                    </div>
+                    ${lead.branche_detail && lead.branche_detail !== 'unknown' ? `<div class="firm-branche">${lead.branche_detail}</div>` : ''}
+                    ${hasDesc ? `
+                    <button class="desc-toggle" onclick="toggleDesc('${descId}', this)">
+                        <span class="arrow">▾</span> Beschreibung
+                    </button>
+                    <div class="firm-description" id="${descId}">${lead.company_description}</div>` : ''}
+                    ${hasKontakt ? `
+                    <button class="contact-toggle" onclick="toggleAcc('${accId}', this)">
+                        <span class="arrow">▼</span> <span>Kontakt anzeigen</span>
+                    </button>` : ''}
+                </td>
+                <td>${profilHtml}</td>
+                <td>${matchHtml}</td>
+                <td>
+                    <div class="why-fit-text">${lead.why_fit || '—'}</div>
+                    ${lead.buyer_signal_reason && lead.buyer_signal_reason !== 'no_signal_detected' ? `
+                    <div class="signal-reason">${lead.buyer_signal_reason.replace(/_/g,' ')}</div>` : ''}
+                </td>
+            </tr>
+            <tr class="accordion-row">
+                <td colspan="4">
+                    <div class="accordion-content" id="${accId}">
+                        <div class="accordion-inner">${contactCardsHtml}</div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    function displayResults(data) {
+        const count = data.lead_count || 0;
+        document.getElementById('lead-count').textContent = `${count} Lead${count !== 1 ? 's' : ''} gefunden`;
+
+        if (!data.leads || data.leads.length === 0) {
+            document.getElementById('results-tbody').innerHTML = `
+                <tr><td colspan="4" class="empty-state">
+                    <h3>Keine Leads gefunden</h3>
+                    <p>Versuche es mit anderen Parametern erneut.</p>
+                </td></tr>`;
+            return;
         }
 
-        function displayResults(data) {
-            const count = data.lead_count || 0;
-            leadCount.textContent = `Gefundene Leads: ${count}`;
+        document.getElementById('results-tbody').innerHTML = data.leads.map(renderRow).join('');
+    }
 
-            if (!data.leads || data.leads.length === 0) {
-                resultsTbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="empty-state">
-                            <h3>Keine Leads gefunden</h3>
-                            <p>Versuche es mit anderen Parametern erneut.</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+    function toggleAcc(id, btn) {
+        const el = document.getElementById(id);
+        const open = el.classList.toggle('open');
+        btn.classList.toggle('open', open);
+        btn.querySelector('span:last-child').textContent = open ? 'Kontakt ausblenden' : 'Kontakt anzeigen';
+    }
 
-            let html = '';
+    function toggleDesc(id, btn) {
+        const el = document.getElementById(id);
+        const open = el.classList.toggle('open');
+        btn.classList.toggle('open', open);
+    }
 
-            data.leads.forEach((lead, idx) => {
-                const alleKontakte = parseAlleKontakte(lead.alle_kontakte);
-                const hasMultiple = alleKontakte.length > 1;
-                const accordionId = `acc-${idx}`;
-
-                html += `
-                    <tr>
-                        <td>
-                            <div class="company-name">${lead.name || 'N/A'}</div>
-                            ${lead.website ? `<div class="company-website">${lead.website}</div>` : ''}
-                        </td>
-                        <td>
-                            <span class="badge ${getBadgeClass(lead.buyer_type)}">
-                                ${lead.buyer_type || 'N/A'}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="score ${getScoreClass(lead.buyer_fit_score)}">
-                                ${lead.buyer_fit_score ?? 'N/A'}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="score ${getScoreClass(lead.lead_feasibility_score)}">
-                                ${lead.lead_feasibility_score ?? 'N/A'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="contact-primary">
-                                <div class="contact-email">${lead.email || 'Nicht gefunden'}</div>
-                                ${lead.kontakt_name ? `<div class="contact-meta">${lead.kontakt_name}</div>` : ''}
-                                ${lead.kontakt_position ? `<div class="contact-meta">${lead.kontakt_position}</div>` : ''}
-                                ${lead.hunter_confidence ? `<span class="hunter-confidence">Hunter ${lead.hunter_confidence}%</span>` : ''}
-                                ${hasMultiple ? `
-                                    <button class="accordion-toggle" onclick="toggleAccordion('${accordionId}', this)">
-                                        <span class="arrow">▼</span> ${alleKontakte.length} Kontakte
-                                    </button>
-                                ` : ''}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="why-fit">${lead.why_fit || 'N/A'}</div>
-                        </td>
-                    </tr>
-                    ${hasMultiple ? `
-                    <tr class="accordion-row">
-                        <td colspan="6">
-                            <div class="accordion-content" id="${accordionId}">
-                                <div class="contacts-grid">
-                                    ${alleKontakte.map(renderContactCard).join('')}
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    ` : ''}
-                `;
-            });
-
-            resultsTbody.innerHTML = html;
-        }
-
-        function toggleAccordion(id, btn) {
-            const content = document.getElementById(id);
-            const isOpen = content.classList.contains('open');
-            content.classList.toggle('open', !isOpen);
-            btn.classList.toggle('open', !isOpen);
-        }
-
-        // Download handler
-        downloadBtn.onclick = () => {
-            if (resultsData.results && resultsData.results.sheet_url) {
-                window.open(resultsData.results.sheet_url, '_blank');
-            } else {
-                alert('Download-Link nicht verfügbar');
-            }
-        };
-
-        if (!sessionId) {
-            alert('Session nicht gefunden');
-            window.location.href = '/';
+    document.getElementById('download-btn').onclick = () => {
+        const data = JSON.parse(sessionStorage.getItem('results_data') || '{}');
+        if (data.results && data.results.sheet_url) {
+            window.open(data.results.sheet_url, '_blank');
         } else {
-            loadResults();
+            alert('Download-Link nicht verfügbar');
         }
-    </script>
+    };
+
+    if (!sessionId) {
+        alert('Session nicht gefunden');
+        window.location.href = '/';
+    } else {
+        loadResults();
+    }
+</script>
 </body>
 </html>
