@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Results - Lead Generation Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -14,7 +15,7 @@
             padding: 24px;
         }
 
-        .container { max-width: 1300px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; }
 
         .header {
             background: white;
@@ -79,7 +80,13 @@
             font-weight: 600;
             color: #1a1a1a;
             font-size: 0.95rem;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
+        }
+
+        .firm-name-full {
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 4px;
         }
 
         .firm-website {
@@ -94,7 +101,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .tag {
@@ -112,43 +119,72 @@
         .tag-sector-comm    { background: #e0f2fe; color: #0369a1; }
         .tag-sector-default { background: #f3f4f6; color: #374151; }
 
+        .firm-address {
+            font-size: 0.78rem;
+            color: #666;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        .firm-address .addr-icon { flex-shrink: 0; margin-top: 1px; }
+
         .firm-branche {
             font-size: 0.78rem;
             color: #999;
             font-style: italic;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
-
-        /* Company description toggle */
-        .desc-toggle {
-            background: none;
-            border: none;
-            padding: 0;
-            font-size: 0.75rem;
-            color: #aaa;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            margin-bottom: 2px;
-            transition: color 0.15s;
-        }
-        .desc-toggle:hover { color: #666; }
-        .desc-toggle .arrow { transition: transform 0.2s; display: inline-block; font-style: normal; }
-        .desc-toggle.open .arrow { transform: rotate(180deg); }
 
         .firm-description {
-            display: none;
             font-size: 0.8rem;
-            color: #666;
-            line-height: 1.5;
-            margin-bottom: 4px;
-            padding: 6px 8px;
+            color: #555;
+            line-height: 1.55;
+            margin-bottom: 6px;
+            padding: 8px 10px;
             background: #F7F7F5;
             border-radius: 6px;
             border-left: 2px solid #E5E5E3;
         }
-        .firm-description.open { display: block; }
+
+        /* Why Fit Toggle */
+        .why-fit-toggle {
+            background: none;
+            border: 1px solid #E5E5E3;
+            border-radius: 6px;
+            padding: 3px 9px;
+            font-size: 0.73rem;
+            color: #888;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+            transition: all 0.15s;
+        }
+        .why-fit-toggle:hover { background: #F3F3F1; border-color: #ccc; color: #555; }
+        .why-fit-toggle .arrow { transition: transform 0.2s; display: inline-block; font-style: normal; }
+        .why-fit-toggle.open .arrow { transform: rotate(180deg); }
+
+        .why-fit-content {
+            display: none;
+            font-size: 0.8rem;
+            color: #555;
+            line-height: 1.5;
+            margin-top: 6px;
+            padding: 8px 10px;
+            background: #F7F7F5;
+            border-radius: 6px;
+            border-left: 2px solid #dbeafe;
+        }
+        .why-fit-content.open { display: block; }
+
+        .signal-reason-text {
+            margin-top: 5px;
+            font-size: 0.73rem;
+            color: #aaa;
+            font-style: italic;
+        }
 
         .contact-toggle {
             margin-top: 8px;
@@ -283,22 +319,6 @@
         .signal-implicit { background: #f59e0b; }
         .signal-none     { background: #d1d5db; }
 
-        /* ── Col 4: Why Fit ── */
-        .why-fit-text {
-            font-size: 0.85rem;
-            color: #555;
-            line-height: 1.5;
-            max-width: 260px;
-        }
-
-        .signal-reason {
-            margin-top: 6px;
-            font-size: 0.75rem;
-            color: #aaa;
-            font-style: italic;
-            max-width: 260px;
-        }
-
         /* ── Accordion ── */
         .accordion-row td { padding: 0; border-bottom: none; }
         tr.accordion-row:hover td { background: transparent; }
@@ -397,11 +417,10 @@
                     <th>Firma</th>
                     <th>Profil</th>
                     <th>Match</th>
-                    <th>Why Fit</th>
                 </tr>
             </thead>
             <tbody id="results-tbody">
-                <tr><td colspan="4" class="loading">Lädt Ergebnisse...</td></tr>
+                <tr><td colspan="3" class="loading">Lädt Ergebnisse...</td></tr>
             </tbody>
         </table>
     </div>
@@ -425,7 +444,7 @@
         } catch (err) {
             console.error(err);
             document.getElementById('results-tbody').innerHTML = `
-                <tr><td colspan="4" class="empty-state">
+                <tr><td colspan="3" class="empty-state">
                     <h3>Fehler beim Laden</h3>
                     <p>Bitte versuche es erneut oder kontaktiere den Support.</p>
                 </td></tr>`;
@@ -486,14 +505,25 @@
         } catch { return []; }
     }
 
+    function renderAddress(lead) {
+        const { address_street, address_zip, address_city, address_country } = lead;
+        if (!address_street || !address_zip || !address_city) return '';
+        const parts = [address_street, `${address_zip} ${address_city}`, address_country].filter(Boolean);
+        return `<div class="firm-address">
+            <span class="addr-icon">📍</span>
+            <span>${parts.join(', ')}</span>
+        </div>`;
+    }
+
     function renderRow(lead, idx) {
         const kontakte = parseKontakte(lead.alle_kontakte);
         const hasKontakt = kontakte.length > 0 || lead.email;
-        const accId  = `acc-${idx}`;
-        const descId = `desc-${idx}`;
+        const accId    = `acc-${idx}`;
+        const whyId    = `why-${idx}`;
         const isAcqYes = lead.akquisitionshistorie === 'yes';
         const eigLabel = eigentumsLabel(lead.eigentumsstruktur);
         const hasDesc  = lead.company_description && lead.company_description !== 'unknown';
+        const hasWhy   = lead.why_fit && lead.why_fit !== '—';
 
         // ── Profil col ──
         const revenueHtml = lead.revenue_estimate
@@ -585,17 +615,23 @@
             <tr class="lead-row${isAcqYes ? ' acq-yes' : ''}">
                 <td>
                     <div class="firm-name">${lead.name || 'N/A'}</div>
+                    ${lead.company_name_full && lead.company_name_full !== lead.name ? `<div class="firm-name-full">${lead.company_name_full}</div>` : (lead.company_name_full ? `<div class="firm-name-full">${lead.company_name_full}</div>` : '')}
                     ${lead.website ? `<a class="firm-website" href="${lead.website.startsWith('http') ? lead.website : 'https://' + lead.website}" target="_blank">${lead.website.replace(/^https?:\/\//,'')}</a>` : ''}
                     <div class="firm-tags">
                         ${lead.gics_sector && lead.gics_sector !== 'unknown' ? `<span class="tag ${sectorTagClass(lead.gics_sector)}">${lead.gics_sector}</span>` : ''}
                         ${lead.hq_country ? `<span class="tag tag-sector-default">${lead.hq_country}</span>` : ''}
                     </div>
                     ${lead.branche_detail && lead.branche_detail !== 'unknown' ? `<div class="firm-branche">${lead.branche_detail}</div>` : ''}
-                    ${hasDesc ? `
-                    <button class="desc-toggle" onclick="toggleDesc('${descId}', this)">
-                        <span class="arrow">▾</span> Beschreibung
+                    ${renderAddress(lead)}
+                    ${hasDesc ? `<div class="firm-description">${lead.company_description}</div>` : ''}
+                    ${hasWhy ? `
+                    <button class="why-fit-toggle" onclick="toggleWhyFit('${whyId}', this)">
+                        <span class="arrow">▾</span> Why Fit
                     </button>
-                    <div class="firm-description" id="${descId}">${lead.company_description}</div>` : ''}
+                    <div class="why-fit-content" id="${whyId}">
+                        ${lead.why_fit}
+                        ${lead.buyer_signal_reason && lead.buyer_signal_reason !== 'no_signal_detected' ? `<div class="signal-reason-text">${lead.buyer_signal_reason.replace(/_/g,' ')}</div>` : ''}
+                    </div>` : ''}
                     ${hasKontakt ? `
                     <button class="contact-toggle" onclick="toggleAcc('${accId}', this)">
                         <span class="arrow">▼</span> <span>Kontakt anzeigen</span>
@@ -603,14 +639,9 @@
                 </td>
                 <td>${profilHtml}</td>
                 <td>${matchHtml}</td>
-                <td>
-                    <div class="why-fit-text">${lead.why_fit || '—'}</div>
-                    ${lead.buyer_signal_reason && lead.buyer_signal_reason !== 'no_signal_detected' ? `
-                    <div class="signal-reason">${lead.buyer_signal_reason.replace(/_/g,' ')}</div>` : ''}
-                </td>
             </tr>
             <tr class="accordion-row">
-                <td colspan="4">
+                <td colspan="3">
                     <div class="accordion-content" id="${accId}">
                         <div class="accordion-inner">${contactCardsHtml}</div>
                     </div>
@@ -625,7 +656,7 @@
 
         if (!data.leads || data.leads.length === 0) {
             document.getElementById('results-tbody').innerHTML = `
-                <tr><td colspan="4" class="empty-state">
+                <tr><td colspan="3" class="empty-state">
                     <h3>Keine Leads gefunden</h3>
                     <p>Versuche es mit anderen Parametern erneut.</p>
                 </td></tr>`;
@@ -642,19 +673,72 @@
         btn.querySelector('span:last-child').textContent = open ? 'Kontakt ausblenden' : 'Kontakt anzeigen';
     }
 
-    function toggleDesc(id, btn) {
+    function toggleWhyFit(id, btn) {
         const el = document.getElementById(id);
         const open = el.classList.toggle('open');
         btn.classList.toggle('open', open);
     }
 
+    // ── Excel Export ──────────────────────────────────────────────────────
     document.getElementById('download-btn').onclick = () => {
         const data = JSON.parse(sessionStorage.getItem('results_data') || '{}');
-        if (data.results && data.results.sheet_url) {
-            window.open(data.results.sheet_url, '_blank');
-        } else {
-            alert('Download-Link nicht verfügbar');
+        if (!data.leads || data.leads.length === 0) {
+            alert('Keine Daten zum Exportieren vorhanden.');
+            return;
         }
+
+        const rows = data.leads.map(lead => {
+            const kontakte = parseKontakte(lead.alle_kontakte);
+            const kontaktStr = kontakte.map(c => `${c.name || ''} (${c.position || ''}) <${c.email || ''}>`).join(' | ');
+
+            return {
+                'Session ID':             lead.session_id || '',
+                'Name':                   lead.name || '',
+                'Vollständiger Name':      lead.company_name_full || '',
+                'Website':                lead.website || '',
+                'HQ Land (ISO)':          lead.hq_country || '',
+                'Straße':                 lead.address_street || '',
+                'PLZ':                    lead.address_zip || '',
+                'Stadt':                  lead.address_city || '',
+                'Land':                   lead.address_country || '',
+                'Beschreibung':           lead.company_description || '',
+                'GICS Sektor':            lead.gics_sector || '',
+                'GICS Industrie':         lead.gics_industry || '',
+                'Branche Detail':         lead.branche_detail || '',
+                'Geschäftsmodell':        lead.geschaeftsmodell || '',
+                'Mitarbeiter':            lead.mitarbeiter_range || '',
+                'Umsatz (Mio €)':         lead.revenue_estimate || '',
+                'Umsatz Konfidenz':       lead.revenue_confidence || '',
+                'Eigentumsstruktur':      lead.eigentumsstruktur || '',
+                'Akquisitionshistorie':   lead.akquisitionshistorie || '',
+                'Buyer Type':             lead.buyer_type || '',
+                'Buyer Fit Score':        lead.buyer_fit_score ?? '',
+                'Buyer Signal':           lead.buyer_signal || '',
+                'Buyer Signal Score':     lead.buyer_signal_score ?? '',
+                'Buyer Signal Reason':    lead.buyer_signal_reason || '',
+                'Why Fit':                lead.why_fit || '',
+                'Lead Feasibility Score': lead.lead_feasibility_score ?? '',
+                'Email':                  lead.email || '',
+                'Kontakt Name':           lead.kontakt_name || '',
+                'Kontakt Position':       lead.kontakt_position || '',
+                'Kontakt Typ':            lead.kontakt_type || '',
+                'Hunter Confidence':      lead.hunter_confidence ?? '',
+                'Anzahl Kontakte':        lead.hunter_contacts_count ?? '',
+                'Alle Kontakte':          kontaktStr,
+            };
+        });
+
+        const ws = XLSX.utils.json_to_sheet(rows);
+
+        // Spaltenbreiten
+        const colWidths = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, 16) }));
+        ws['!cols'] = colWidths;
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Leads');
+
+        const sessionLabel = sessionId ? sessionId.slice(0, 8) : 'export';
+        XLSX.writeFile(wb, `leads_${sessionLabel}_${new Date().toISOString().slice(0,10)}.xlsx`);
     };
 
     if (!sessionId) {
